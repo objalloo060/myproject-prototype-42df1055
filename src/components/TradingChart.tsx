@@ -35,27 +35,27 @@ export default function TradingChart({ onPriceUpdate }: TradingChartProps) {
       height: 300,
       layout: {
         background: { color: "transparent" },
-        textColor: "hsl(228, 15%, 55%)",
+        textColor: "#7a7f96",
         fontFamily: "Inter",
       },
       grid: {
-        vertLines: { color: "hsl(228, 30%, 14%)" },
-        horzLines: { color: "hsl(228, 30%, 14%)" },
+        vertLines: { color: "#1a2140" },
+        horzLines: { color: "#1a2140" },
       },
       crosshair: { mode: 0 },
-      rightPriceScale: { borderColor: "hsl(228, 30%, 18%)" },
-      timeScale: { borderColor: "hsl(228, 30%, 18%)" },
+      rightPriceScale: { borderColor: "#232b4a" },
+      timeScale: { borderColor: "#232b4a" },
     });
 
     chartRef.current = chart;
 
     const series = chart.addCandlestickSeries({
-      upColor: "hsl(160, 100%, 38%)",
-      downColor: "hsl(0, 100%, 65%)",
-      borderUpColor: "hsl(160, 100%, 38%)",
-      borderDownColor: "hsl(0, 100%, 65%)",
-      wickUpColor: "hsl(160, 100%, 38%)",
-      wickDownColor: "hsl(0, 100%, 65%)",
+      upColor: "#00c261",
+      downColor: "#ff4d4f",
+      borderUpColor: "#00c261",
+      borderDownColor: "#ff4d4f",
+      wickUpColor: "#00c261",
+      wickDownColor: "#ff4d4f",
     });
 
     seriesRef.current = series;
