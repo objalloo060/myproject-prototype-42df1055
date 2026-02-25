@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useTradeStore } from "@/hooks/useTradeStore";
 import BottomNav from "@/components/BottomNav";
+import ChatWidget from "@/components/ChatWidget";
 import AuthPage from "@/pages/AuthPage";
 import TradePage from "@/pages/TradePage";
 import WalletPage from "@/pages/WalletPage";
 import CalculatorPage from "@/pages/CalculatorPage";
 import OrdersPage from "@/pages/OrdersPage";
+import MarketsPage from "@/pages/MarketsPage";
 
-type Page = "trade" | "orders" | "calculator" | "wallet";
+type Page = "trade" | "markets" | "orders" | "wallet";
 
 export default function Index() {
   const store = useTradeStore();
@@ -16,6 +18,11 @@ export default function Index() {
   if (!store.isLoggedIn) {
     return <AuthPage onLogin={store.login} />;
   }
+
+  const handleSelectPair = (symbol: string) => {
+    store.setCurrentSymbol(symbol);
+    setPage("trade");
+  };
 
   return (
     <div className="min-h-screen pb-20">
@@ -57,8 +64,10 @@ export default function Index() {
             trades={store.trades}
             onPriceUpdate={store.setCurrentPrice}
             onTrade={store.placeTrade}
+            onSymbolChange={handleSelectPair}
           />
         )}
+        {page === "markets" && <MarketsPage onSelectPair={handleSelectPair} />}
         {page === "wallet" && (
           <WalletPage
             balance={store.balance}
@@ -67,11 +76,11 @@ export default function Index() {
             onWithdraw={store.withdraw}
           />
         )}
-        {page === "calculator" && <CalculatorPage />}
         {page === "orders" && <OrdersPage trades={store.trades} />}
       </div>
 
       <BottomNav active={page} onNavigate={setPage} />
+      <ChatWidget />
     </div>
   );
 }

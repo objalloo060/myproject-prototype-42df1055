@@ -2,30 +2,30 @@ import { useEffect, useRef } from "react";
 import { createChart, type IChartApi, type ISeriesApi } from "lightweight-charts";
 
 interface TradingChartProps {
+  basePrice?: number;
   onPriceUpdate?: (price: number) => void;
 }
 
-function generateCandlestickData() {
+function generateCandlestickData(basePrice: number) {
   const data = [];
   let time = Math.floor(Date.now() / 1000) - 200 * 60;
-  let close = 67000 + Math.random() * 1000;
+  let close = basePrice + Math.random() * (basePrice * 0.02);
 
   for (let i = 0; i < 200; i++) {
     const open = close;
-    const change = (Math.random() - 0.48) * 200;
+    const change = (Math.random() - 0.48) * (basePrice * 0.003);
     close = open + change;
-    const high = Math.max(open, close) + Math.random() * 100;
-    const low = Math.min(open, close) - Math.random() * 100;
+    const high = Math.max(open, close) + Math.random() * (basePrice * 0.0015);
+    const low = Math.min(open, close) - Math.random() * (basePrice * 0.0015);
     data.push({ time: time as any, open, high, low, close });
     time += 60;
   }
   return data;
 }
 
-export default function TradingChart({ onPriceUpdate }: TradingChartProps) {
+export default function TradingChart({ basePrice = 67000, onPriceUpdate }: TradingChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
-  const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -58,8 +58,7 @@ export default function TradingChart({ onPriceUpdate }: TradingChartProps) {
       wickDownColor: "#ff4d4f",
     });
 
-    seriesRef.current = series;
-    const data = generateCandlestickData();
+    const data = generateCandlestickData(basePrice);
     series.setData(data);
     chart.timeScale().fitContent();
 
@@ -67,14 +66,13 @@ export default function TradingChart({ onPriceUpdate }: TradingChartProps) {
       onPriceUpdate(data[data.length - 1].close);
     }
 
-    // Simulate live updates
     let lastData = data[data.length - 1];
     const interval = setInterval(() => {
       const open = lastData.close;
-      const change = (Math.random() - 0.48) * 80;
+      const change = (Math.random() - 0.48) * (basePrice * 0.0012);
       const close = open + change;
-      const high = Math.max(open, close) + Math.random() * 40;
-      const low = Math.min(open, close) - Math.random() * 40;
+      const high = Math.max(open, close) + Math.random() * (basePrice * 0.0006);
+      const low = Math.min(open, close) - Math.random() * (basePrice * 0.0006);
       const newBar = {
         time: (lastData.time as number + 60) as any,
         open, high, low, close,
@@ -96,7 +94,7 @@ export default function TradingChart({ onPriceUpdate }: TradingChartProps) {
       window.removeEventListener("resize", handleResize);
       chart.remove();
     };
-  }, []);
+  }, [basePrice]);
 
   return <div ref={containerRef} className="rounded-lg overflow-hidden" />;
 }
