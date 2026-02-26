@@ -1,6 +1,6 @@
-import { TrendingUp, BarChart3, ClipboardList, Wallet, Blocks } from "lucide-react";
+import { TrendingUp, BarChart3, ClipboardList, Wallet } from "lucide-react";
 
-type Page = "trade" | "markets" | "orders" | "wallet" | "blockchain";
+type Page = "trade" | "markets" | "orders" | "wallet";
 
 interface BottomNavProps {
   active: Page;
@@ -10,7 +10,6 @@ interface BottomNavProps {
 const items: { id: Page; label: string; icon: typeof TrendingUp }[] = [
   { id: "trade", label: "Trade", icon: TrendingUp },
   { id: "markets", label: "Markets", icon: BarChart3 },
-  { id: "blockchain", label: "Chain", icon: Blocks },
   { id: "orders", label: "Orders", icon: ClipboardList },
   { id: "wallet", label: "Assets", icon: Wallet },
 ];
