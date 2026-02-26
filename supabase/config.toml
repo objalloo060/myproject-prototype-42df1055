@@ -2,3 +2,6 @@ project_id = "ikviehrvgqwrbakfrgnv"
 
 [functions.chat]
 verify_jwt = false
+
+[functions.blockchain]
+verify_jwt = false

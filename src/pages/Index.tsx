@@ -8,8 +8,9 @@ import WalletPage from "@/pages/WalletPage";
 import CalculatorPage from "@/pages/CalculatorPage";
 import OrdersPage from "@/pages/OrdersPage";
 import MarketsPage from "@/pages/MarketsPage";
+import BlockchainPage from "@/pages/BlockchainPage";
 
-type Page = "trade" | "markets" | "orders" | "wallet";
+type Page = "trade" | "markets" | "orders" | "wallet" | "blockchain";
 
 export default function Index() {
   const store = useTradeStore();
@@ -68,7 +69,7 @@ export default function Index() {
           />
         )}
         {page === "markets" && <MarketsPage onSelectPair={handleSelectPair} />}
-        
+        {page === "blockchain" && <BlockchainPage />}
         {page === "wallet" && (
           <WalletPage
             balance={store.balance}
