@@ -6,6 +6,8 @@ interface Transaction {
   sender: string;
   recipient: string;
   amount: number;
+  transactionId?: string;
+  timestamp?: number;
 }
 
 interface Block {
