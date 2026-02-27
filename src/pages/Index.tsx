@@ -9,8 +9,9 @@ import CalculatorPage from "@/pages/CalculatorPage";
 import OrdersPage from "@/pages/OrdersPage";
 import MarketsPage from "@/pages/MarketsPage";
 import BlockchainPage from "@/pages/BlockchainPage";
+import ProfilePage from "@/pages/ProfilePage";
 
-type Page = "trade" | "markets" | "orders" | "wallet" | "blockchain";
+type Page = "trade" | "markets" | "orders" | "wallet" | "blockchain" | "profile";
 
 export default function Index() {
   const store = useTradeStore();
@@ -79,6 +80,14 @@ export default function Index() {
           />
         )}
         {page === "orders" && <OrdersPage trades={store.trades} />}
+        {page === "profile" && (
+          <ProfilePage
+            username={store.username}
+            balance={store.balance}
+            isDemo={store.isDemo}
+            onLogout={store.logout}
+          />
+        )}
       </div>
 
       <BottomNav active={page} onNavigate={setPage} />
