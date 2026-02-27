@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, QrCode } from "lucide-react";
+import QRCodeModal from "@/components/QRCodeModal";
 
 interface SavedAddress {
   id: string;
@@ -30,6 +31,7 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
   const [selectedAddress, setSelectedAddress] = useState("");
   const [withdrawCurrency, setWithdrawCurrency] = useState("USDT");
   const [withdrawChain, setWithdrawChain] = useState("ETH");
+  const [qrAddr, setQrAddr] = useState<SavedAddress | null>(null);
 
   const handleDeposit = () => {
     const num = parseFloat(depAmount);
@@ -112,6 +114,9 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
                         {addr.currency} · {addr.chain} · {addr.address.slice(0, 12)}...
                       </p>
                     </div>
+                    <button onClick={() => setQrAddr(addr)} className="text-primary ml-2 shrink-0">
+                      <QrCode size={16} />
+                    </button>
                     <button onClick={() => deleteAddress(addr.id)} className="text-destructive ml-2 shrink-0">
                       <Trash2 size={16} />
                     </button>
@@ -236,6 +241,16 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
             </div>
           </div>
         </div>
+      )}
+      {qrAddr && (
+        <QRCodeModal
+          open={!!qrAddr}
+          onClose={() => setQrAddr(null)}
+          address={qrAddr.address}
+          currency={qrAddr.currency}
+          chain={qrAddr.chain}
+          label={qrAddr.label}
+        />
       )}
     </div>
   );
