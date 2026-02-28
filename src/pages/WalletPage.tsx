@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Trash2, QrCode } from "lucide-react";
+import { Trash2, QrCode, Wallet } from "lucide-react";
 import QRCodeModal from "@/components/QRCodeModal";
 
 interface SavedAddress {
@@ -9,6 +9,30 @@ interface SavedAddress {
   address: string;
   label: string;
 }
+
+const DEPOSIT_ADDRESSES: Record<string, Record<string, string>> = {
+  USDT: {
+    ETH: "0x1a2b3c4d5e6f7890abcdef1234567890abcdef12",
+    TRX: "TXyz1234567890abcdefghijklmnopqrst",
+    BSC: "0xbsc1a2b3c4d5e6f7890abcdef12345678",
+    POLYGON: "0xpoly1a2b3c4d5e6f7890abcdef1234567",
+  },
+  BTC: { BTC: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh" },
+  ETH: { ETH: "0xeth1a2b3c4d5e6f7890abcdef1234567890ab" },
+  USDC: {
+    ETH: "0xusdc1a2b3c4d5e6f7890abcdef123456789",
+    POLYGON: "0xusdcpoly1a2b3c4d5e6f7890abcdef1234",
+  },
+  BNB: { BSC: "0xbnb1a2b3c4d5e6f7890abcdef1234567890ab" },
+};
+
+const NETWORK_LABELS: Record<string, string> = {
+  ETH: "Ethereum (ERC20)",
+  TRX: "Tron (TRC20)",
+  BSC: "Binance Smart Chain (BEP20)",
+  POLYGON: "Polygon",
+  BTC: "Bitcoin",
+};
 
 interface WalletPageProps {
   balance: number;
@@ -32,6 +56,10 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
   const [withdrawCurrency, setWithdrawCurrency] = useState("USDT");
   const [withdrawChain, setWithdrawChain] = useState("ETH");
   const [qrAddr, setQrAddr] = useState<SavedAddress | null>(null);
+
+  const [depositCurrency, setDepositCurrency] = useState("USDT");
+  const [depositNetwork, setDepositNetwork] = useState("ETH");
+  const [showDepositQR, setShowDepositQR] = useState(false);
 
   const handleDeposit = () => {
     const num = parseFloat(depAmount);
@@ -132,13 +160,68 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
             </button>
           </div>
 
-          {/* Deposit */}
+          {/* Deposit GBP */}
           <div className="bg-card p-5 rounded-lg space-y-3">
-            <h3 className="font-semibold">Deposit</h3>
+            <h3 className="font-semibold">Deposit GBP</h3>
             <input type="number" value={depAmount} onChange={(e) => setDepAmount(e.target.value)} placeholder="Amount" className={inputClass} />
             <button onClick={handleDeposit} className="w-full py-3 rounded-lg font-semibold bg-primary text-primary-foreground transition-all hover:brightness-110">
               Deposit GBP
             </button>
+          </div>
+
+          {/* Deposit Crypto */}
+          <div className="bg-card p-5 rounded-lg space-y-3">
+            <h3 className="font-semibold flex items-center gap-2">
+              <Wallet size={16} className="text-primary" /> Deposit Crypto
+            </h3>
+            <p className="text-xs text-muted-foreground">Generate a QR code to receive cryptocurrency deposits</p>
+            <div>
+              <label className="text-sm text-muted-foreground mb-1 block">Cryptocurrency</label>
+              <select value={depositCurrency} onChange={(e) => { setDepositCurrency(e.target.value); setShowDepositQR(false); const nets = Object.keys(DEPOSIT_ADDRESSES[e.target.value] || {}); setDepositNetwork(nets[0] || "ETH"); }} className={selectClass}>
+                {Object.keys(DEPOSIT_ADDRESSES).map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground mb-1 block">Network</label>
+              <select value={depositNetwork} onChange={(e) => { setDepositNetwork(e.target.value); setShowDepositQR(false); }} className={selectClass}>
+                {Object.keys(DEPOSIT_ADDRESSES[depositCurrency] || {}).map((n) => (
+                  <option key={n} value={n}>{NETWORK_LABELS[n] || n}</option>
+                ))}
+              </select>
+            </div>
+            <button
+              onClick={() => setShowDepositQR(true)}
+              className="w-full py-3 rounded-lg font-semibold bg-success text-success-foreground transition-all hover:brightness-110 flex items-center justify-center gap-2"
+            >
+              <QrCode size={16} /> Generate Deposit QR Code
+            </button>
+            {showDepositQR && DEPOSIT_ADDRESSES[depositCurrency]?.[depositNetwork] && (
+              <div className="mt-2 p-3 bg-secondary rounded-lg space-y-2">
+                <div className="flex gap-2 flex-wrap">
+                  {["USDT", "BTC", "ETH", "USDC"].filter((c) => DEPOSIT_ADDRESSES[c]).map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => { setDepositCurrency(c); const nets = Object.keys(DEPOSIT_ADDRESSES[c]); setDepositNetwork(nets[0]); }}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${depositCurrency === c ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Network: <span className="text-foreground font-medium">{NETWORK_LABELS[depositNetwork] || depositNetwork}</span>
+                </p>
+                <button
+                  onClick={() => setQrAddr({ id: "deposit", currency: depositCurrency, chain: depositNetwork, address: DEPOSIT_ADDRESSES[depositCurrency][depositNetwork], label: `Deposit ${depositCurrency} (${NETWORK_LABELS[depositNetwork] || depositNetwork})` })}
+                  className="w-full py-2.5 rounded-lg font-semibold bg-primary text-primary-foreground transition-all hover:brightness-110 flex items-center justify-center gap-2 text-sm"
+                >
+                  <QrCode size={14} /> View QR Code
+                </button>
+                <div className="bg-warning/10 border border-warning/30 rounded-lg p-3 mt-1">
+                  <p className="text-xs text-warning font-medium">⚠️ Only send {depositCurrency} on {NETWORK_LABELS[depositNetwork] || depositNetwork}. Wrong network = permanent loss.</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Withdraw */}
