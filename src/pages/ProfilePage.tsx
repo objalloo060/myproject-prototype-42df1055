@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Copy, LogOut, Download, User, Shield, Hash } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProfilePageProps {
   username: string;
@@ -9,20 +10,26 @@ interface ProfilePageProps {
   onLogout: () => void;
 }
 
-function generateUID(username: string): string {
-  const stored = localStorage.getItem("protradeUID");
-  if (stored) return stored;
-
-  const random = Math.random().toString(36).substring(2, 10).toUpperCase();
-  const ts = Date.now().toString(36).toUpperCase();
-  const uid = `UID-${random}${ts}`.substring(0, 16);
-  localStorage.setItem("protradeUID", uid);
-  return uid;
-}
-
 export default function ProfilePage({ username, balance, isDemo, onLogout }: ProfilePageProps) {
   const [showConfirm, setShowConfirm] = useState(false);
-  const uid = useMemo(() => generateUID(username), [username]);
+  const [uid, setUid] = useState("Loading...");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setEmail(user.email || "");
+        supabase
+          .from("profiles")
+          .select("uid")
+          .eq("user_id", user.id)
+          .single()
+          .then(({ data }) => {
+            if (data) setUid(data.uid);
+          });
+      }
+    });
+  }, []);
 
   const copyUID = async () => {
     try {
@@ -45,6 +52,7 @@ export default function ProfilePage({ username, balance, isDemo, onLogout }: Pro
     const data = {
       uid,
       username,
+      email,
       balance,
       mode: isDemo ? "demo" : "real",
       exported_at: new Date().toISOString(),
@@ -59,9 +67,8 @@ export default function ProfilePage({ username, balance, isDemo, onLogout }: Pro
     toast({ title: "Data exported" });
   };
 
-  const handleSignOut = () => {
-    localStorage.removeItem("protradeUID");
-    onLogout();
+  const handleSignOut = async () => {
+    await onLogout();
     toast({ title: "Signed out successfully" });
   };
 
@@ -73,6 +80,7 @@ export default function ProfilePage({ username, balance, isDemo, onLogout }: Pro
           <User className="text-primary" size={32} />
         </div>
         <h2 className="text-xl font-bold">{username}</h2>
+        <span className="text-xs text-muted-foreground">{email}</span>
         <span className="text-xs text-muted-foreground">
           {isDemo ? "Demo Account" : "Real Account"}
         </span>
@@ -95,6 +103,9 @@ export default function ProfilePage({ username, balance, isDemo, onLogout }: Pro
             <Copy size={16} />
           </button>
         </div>
+        <p className="text-xs text-muted-foreground flex items-center gap-1">
+          🔒 Permanently assigned to: {email}
+        </p>
       </div>
 
       {/* Balance */}

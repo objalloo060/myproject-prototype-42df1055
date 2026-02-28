@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTradeStore } from "@/hooks/useTradeStore";
 import BottomNav from "@/components/BottomNav";
 import ChatWidget from "@/components/ChatWidget";
@@ -9,16 +9,73 @@ import CalculatorPage from "@/pages/CalculatorPage";
 import OrdersPage from "@/pages/OrdersPage";
 import MarketsPage from "@/pages/MarketsPage";
 import ProfilePage from "@/pages/ProfilePage";
+import { supabase } from "@/integrations/supabase/client";
+import type { Session } from "@supabase/supabase-js";
 
 type Page = "trade" | "markets" | "orders" | "wallet" | "profile";
 
 export default function Index() {
   const store = useTradeStore();
   const [page, setPage] = useState<Page>("trade");
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<{ username: string; uid: string } | null>(null);
 
-  if (!store.isLoggedIn) {
-    return <AuthPage onLogin={store.login} />;
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        // Fetch profile after session change
+        setTimeout(() => {
+          supabase
+            .from("profiles")
+            .select("username, uid")
+            .eq("user_id", session.user.id)
+            .single()
+            .then(({ data }) => {
+              if (data) setProfile(data);
+            });
+        }, 0);
+      } else {
+        setProfile(null);
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+      if (session?.user) {
+        supabase
+          .from("profiles")
+          .select("username, uid")
+          .eq("user_id", session.user.id)
+          .single()
+          .then(({ data }) => {
+            if (data) setProfile(data);
+          });
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      </div>
+    );
   }
+
+  if (!session) {
+    return <AuthPage />;
+  }
+
+  const username = profile?.username || session.user.user_metadata?.username || "User";
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
 
   const handleSelectPair = (symbol: string) => {
     store.setCurrentSymbol(symbol);
@@ -80,10 +137,10 @@ export default function Index() {
         {page === "orders" && <OrdersPage trades={store.trades} />}
         {page === "profile" && (
           <ProfilePage
-            username={store.username}
+            username={username}
             balance={store.balance}
             isDemo={store.isDemo}
-            onLogout={store.logout}
+            onLogout={handleLogout}
           />
         )}
       </div>
