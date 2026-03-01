@@ -24,4 +24,7 @@ export const cryptoPairs: CryptoPair[] = [
   { symbol: "XAUT/USDT", label: "Tether Gold", basePrice: 2340 },
   { symbol: "SHIB/USDT", label: "Shiba Inu", basePrice: 0.000009 },
   { symbol: "PEPE/USDT", label: "Pepe", basePrice: 0.0000007 },
+  { symbol: "FLOKI/USDT", label: "Floki Inu", basePrice: 0.00015 },
+  { symbol: "BONK/USDT", label: "Bonk", basePrice: 0.000025 },
+  { symbol: "WIF/USDT", label: "dogwifhat", basePrice: 0.6 },
 ];
