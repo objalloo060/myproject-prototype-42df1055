@@ -20,4 +20,8 @@ export const cryptoPairs: CryptoPair[] = [
   { symbol: "LTC/USDT", label: "Litecoin", basePrice: 85 },
   { symbol: "ATOM/USDT", label: "Cosmos", basePrice: 8 },
   { symbol: "ETC/USDT", label: "Ethereum Classic", basePrice: 20 },
+  { symbol: "PAXG/USDT", label: "PAX Gold", basePrice: 2350 },
+  { symbol: "XAUT/USDT", label: "Tether Gold", basePrice: 2340 },
+  { symbol: "SHIB/USDT", label: "Shiba Inu", basePrice: 0.000009 },
+  { symbol: "PEPE/USDT", label: "Pepe", basePrice: 0.0000007 },
 ];
