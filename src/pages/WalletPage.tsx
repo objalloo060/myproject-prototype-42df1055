@@ -58,6 +58,7 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
   const [withdrawChain, setWithdrawChain] = useState("ETH");
   const [qrAddr, setQrAddr] = useState<SavedAddress | null>(null);
   const [showWithdrawAuth, setShowWithdrawAuth] = useState(false);
+  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
 
   const [depositCurrency, setDepositCurrency] = useState("USDT");
   const [depositNetwork, setDepositNetwork] = useState("ETH");
@@ -272,7 +273,14 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
                 )}
               </div>
             )}
-            <button onClick={() => setShowWithdrawAuth(true)} className="w-full py-3 rounded-lg font-semibold bg-destructive text-destructive-foreground transition-all hover:brightness-110">
+            <button
+              onClick={() => {
+                const num = parseFloat(withdrawAmount);
+                if (!num || num <= 0) return;
+                setShowWithdrawConfirm(true);
+              }}
+              className="w-full py-3 rounded-lg font-semibold bg-destructive text-destructive-foreground transition-all hover:brightness-110"
+            >
               Withdraw
             </button>
           </div>
@@ -336,6 +344,66 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
           chain={qrAddr.chain}
           label={qrAddr.label}
         />
+      )}
+      {/* Withdraw Confirmation Modal */}
+      {showWithdrawConfirm && (
+        <div className="fixed inset-0 bg-background/70 z-[200] flex items-center justify-center p-4" onClick={() => setShowWithdrawConfirm(false)}>
+          <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-sm space-y-4 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-bold text-lg text-center">Confirm Withdrawal</h3>
+            <p className="text-sm text-muted-foreground text-center">Please review the details below</p>
+
+            <div className="bg-secondary rounded-lg p-4 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Amount</span>
+                <span className="font-bold font-mono">${parseFloat(withdrawAmount).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Method</span>
+                <span className="font-medium">{withdrawMethod === "bank" ? "Bank Transfer" : "Crypto Exchange"}</span>
+              </div>
+              {withdrawMethod === "crypto" && (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Currency</span>
+                    <span className="font-medium">{withdrawCurrency}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Network</span>
+                    <span className="font-medium">{NETWORK_LABELS[withdrawChain] || withdrawChain}</span>
+                  </div>
+                  {selectedAddress && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Address</span>
+                      <span className="font-mono text-xs truncate max-w-[150px]">{selectedAddress}</span>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            <div className="bg-warning/10 border border-warning/30 rounded-lg p-3">
+              <p className="text-xs text-warning">⚠️ Withdrawals are final and cannot be reversed. Please verify all details.</p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowWithdrawConfirm(false)}
+                className="flex-1 py-3 rounded-lg font-semibold border border-border text-foreground hover:bg-accent transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowWithdrawConfirm(false);
+                  setShowWithdrawAuth(true);
+                }}
+                className="flex-1 py-3 rounded-lg font-semibold bg-destructive text-destructive-foreground hover:brightness-110 transition-all"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       <PasswordAuthModal
         open={showWithdrawAuth}
