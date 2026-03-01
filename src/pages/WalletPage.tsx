@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Trash2, QrCode, Wallet } from "lucide-react";
 import QRCodeModal from "@/components/QRCodeModal";
+import PasswordAuthModal from "@/components/PasswordAuthModal";
 
 interface SavedAddress {
   id: string;
@@ -56,6 +57,7 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
   const [withdrawCurrency, setWithdrawCurrency] = useState("USDT");
   const [withdrawChain, setWithdrawChain] = useState("ETH");
   const [qrAddr, setQrAddr] = useState<SavedAddress | null>(null);
+  const [showWithdrawAuth, setShowWithdrawAuth] = useState(false);
 
   const [depositCurrency, setDepositCurrency] = useState("USDT");
   const [depositNetwork, setDepositNetwork] = useState("ETH");
@@ -270,7 +272,7 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
                 )}
               </div>
             )}
-            <button onClick={handleWithdraw} className="w-full py-3 rounded-lg font-semibold bg-destructive text-destructive-foreground transition-all hover:brightness-110">
+            <button onClick={() => setShowWithdrawAuth(true)} className="w-full py-3 rounded-lg font-semibold bg-destructive text-destructive-foreground transition-all hover:brightness-110">
               Withdraw
             </button>
           </div>
@@ -335,6 +337,16 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
           label={qrAddr.label}
         />
       )}
+      <PasswordAuthModal
+        open={showWithdrawAuth}
+        onClose={() => setShowWithdrawAuth(false)}
+        onConfirm={() => {
+          setShowWithdrawAuth(false);
+          handleWithdraw();
+        }}
+        title="Confirm Withdrawal"
+        description="Enter your password to authorize this withdrawal"
+      />
     </div>
   );
 }
