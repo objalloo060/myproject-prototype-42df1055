@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Copy, LogOut, Download, User, Shield, Hash } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import PasswordAuthModal from "@/components/PasswordAuthModal";
 
 interface ProfilePageProps {
   username: string;
@@ -12,6 +13,7 @@ interface ProfilePageProps {
 
 export default function ProfilePage({ username, balance, isDemo, onLogout }: ProfilePageProps) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showPasswordAuth, setShowPasswordAuth] = useState(false);
   const [uid, setUid] = useState("Loading...");
   const [email, setEmail] = useState("");
 
@@ -144,7 +146,7 @@ export default function ProfilePage({ username, balance, isDemo, onLogout }: Pro
 
         {!showConfirm ? (
           <button
-            onClick={() => setShowConfirm(true)}
+            onClick={() => setShowPasswordAuth(true)}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold bg-destructive/15 text-destructive hover:bg-destructive/25 transition-colors"
           >
             <LogOut size={18} />
@@ -170,6 +172,17 @@ export default function ProfilePage({ username, balance, isDemo, onLogout }: Pro
           </div>
         )}
       </div>
+
+      <PasswordAuthModal
+        open={showPasswordAuth}
+        onClose={() => setShowPasswordAuth(false)}
+        onConfirm={() => {
+          setShowPasswordAuth(false);
+          setShowConfirm(true);
+        }}
+        title="Sign Out"
+        description="Enter your password to confirm sign out"
+      />
     </div>
   );
 }
