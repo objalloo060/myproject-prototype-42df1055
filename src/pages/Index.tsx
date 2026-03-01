@@ -9,10 +9,11 @@ import CalculatorPage from "@/pages/CalculatorPage";
 import OrdersPage from "@/pages/OrdersPage";
 import MarketsPage from "@/pages/MarketsPage";
 import ProfilePage from "@/pages/ProfilePage";
+import BlockchainPage from "@/pages/BlockchainPage";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 
-type Page = "trade" | "markets" | "orders" | "wallet" | "profile";
+type Page = "trade" | "markets" | "orders" | "wallet" | "profile" | "blockchain";
 
 export default function Index() {
   const store = useTradeStore();
@@ -143,6 +144,7 @@ export default function Index() {
             onLogout={handleLogout}
           />
         )}
+        {page === "blockchain" && <BlockchainPage />}
       </div>
 
       <BottomNav active={page} onNavigate={setPage} />

@@ -1,12 +1,13 @@
-import { TrendingUp, BarChart3, ClipboardList, Wallet, UserCircle } from "lucide-react";
+import { TrendingUp, BarChart3, ClipboardList, Wallet, UserCircle, Link } from "lucide-react";
 
-type Page = "trade" | "markets" | "orders" | "wallet" | "profile";
+type Page = "trade" | "markets" | "orders" | "wallet" | "profile" | "blockchain";
 
 const items: { id: Page; label: string; icon: typeof TrendingUp }[] = [
   { id: "trade", label: "Trade", icon: TrendingUp },
   { id: "markets", label: "Markets", icon: BarChart3 },
   { id: "orders", label: "Orders", icon: ClipboardList },
   { id: "wallet", label: "Assets", icon: Wallet },
+  { id: "blockchain", label: "Chain", icon: Link },
   { id: "profile", label: "Profile", icon: UserCircle },
 ];
 
