@@ -278,6 +278,7 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
                     <option value="TRX">Tron (TRC20)</option>
                     <option value="BSC">Binance Smart Chain (BEP20)</option>
                     <option value="POLYGON">Polygon</option>
+                    <option value="BTC">Bitcoin</option>
                   </select>
                 </div>
                 {filteredAddresses.length > 0 && (
@@ -336,6 +337,7 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
                 <option value="TRX">Tron (TRC20)</option>
                 <option value="BSC">Binance Smart Chain (BEP20)</option>
                 <option value="POLYGON">Polygon</option>
+                <option value="BTC">Bitcoin</option>
               </select>
             </div>
             <div>
