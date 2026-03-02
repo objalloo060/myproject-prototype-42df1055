@@ -7,6 +7,8 @@ export interface CryptoPair {
 export const cryptoPairs: CryptoPair[] = [
   { symbol: "BTC/USDT", label: "Bitcoin", basePrice: 60000 },
   { symbol: "ETH/USDT", label: "Ethereum", basePrice: 3000 },
+  { symbol: "USDT/USD", label: "Tether", basePrice: 1 },
+  { symbol: "USDC/USDT", label: "USD Coin", basePrice: 1 },
   { symbol: "BNB/USDT", label: "Binance Coin", basePrice: 400 },
   { symbol: "SOL/USDT", label: "Solana", basePrice: 100 },
   { symbol: "XRP/USDT", label: "Ripple", basePrice: 0.5 },
