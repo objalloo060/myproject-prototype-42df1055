@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Trash2, QrCode, Wallet } from "lucide-react";
 import QRCodeModal from "@/components/QRCodeModal";
 import PasswordAuthModal from "@/components/PasswordAuthModal";
+import { useCryptoBalances } from "@/hooks/useCryptoBalances";
+import CryptoPortfolio from "@/components/CryptoPortfolio";
+import ConvertCryptoModal from "@/components/ConvertCryptoModal";
 
 interface SavedAddress {
   id: string;
@@ -63,6 +66,12 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
   const [depositCurrency, setDepositCurrency] = useState("USDT");
   const [depositNetwork, setDepositNetwork] = useState("ETH");
   const [showDepositQR, setShowDepositQR] = useState(false);
+
+  // Crypto conversion state
+  const cryptoStore = useCryptoBalances(balance);
+  const [showConvertTo, setShowConvertTo] = useState(false);
+  const [showConvertFrom, setShowConvertFrom] = useState(false);
+  const [convertFromCurrency, setConvertFromCurrency] = useState("BTC");
 
   const handleDeposit = () => {
     const num = parseFloat(depAmount);
@@ -130,6 +139,19 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
 
       {!isDemo && (
         <>
+          {/* Crypto Portfolio & Conversion */}
+          <CryptoPortfolio
+            holdings={cryptoStore.holdings}
+            totalCryptoValue={cryptoStore.totalCryptoValue}
+            totalPortfolioValue={cryptoStore.totalPortfolioValue}
+            fiatBalance={balance}
+            onConvertTo={() => setShowConvertTo(true)}
+            onConvertFrom={(currency) => {
+              setConvertFromCurrency(currency);
+              setShowConvertFrom(true);
+            }}
+          />
+
           {/* Saved Addresses */}
           <div className="bg-card p-5 rounded-lg space-y-3">
             <h3 className="font-semibold">Saved Wallet Addresses</h3>
@@ -414,6 +436,35 @@ export default function WalletPage({ balance, isDemo, onDeposit, onWithdraw }: W
         }}
         title="Confirm Withdrawal"
         description="Enter your password to authorize this withdrawal"
+      />
+      {/* Convert Modals */}
+      <ConvertCryptoModal
+        open={showConvertTo}
+        onClose={() => setShowConvertTo(false)}
+        direction="to"
+        fiatBalance={balance}
+        availableCurrencies={cryptoStore.availableCurrencies}
+        onConvertTo={cryptoStore.convertToCrypto}
+        onConvertFrom={cryptoStore.convertFromCrypto}
+        onBalanceChange={(delta) => {
+          if (delta < 0) onWithdraw(Math.abs(delta));
+          else onDeposit(delta);
+        }}
+      />
+      <ConvertCryptoModal
+        open={showConvertFrom}
+        onClose={() => setShowConvertFrom(false)}
+        direction="from"
+        fiatBalance={balance}
+        cryptoBalance={cryptoStore.balances[convertFromCurrency] || 0}
+        initialCurrency={convertFromCurrency}
+        availableCurrencies={cryptoStore.availableCurrencies}
+        onConvertTo={cryptoStore.convertToCrypto}
+        onConvertFrom={cryptoStore.convertFromCrypto}
+        onBalanceChange={(delta) => {
+          if (delta < 0) onWithdraw(Math.abs(delta));
+          else onDeposit(delta);
+        }}
       />
     </div>
   );
