@@ -45,7 +45,7 @@ export default function TradePage({
         </h3>
       </div>
 
-      <TradingChart basePrice={currentPair.basePrice} onPriceUpdate={onPriceUpdate} />
+      <TradingChart symbol={symbol} basePrice={currentPair.basePrice} onPriceUpdate={onPriceUpdate} />
 
       <ActiveTrades trades={trades} />
 
