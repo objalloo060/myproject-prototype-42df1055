@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Welcome to your github project
 
 ## Project 
 https://github.com/objalloo060/myproject-prototype-42df1055
