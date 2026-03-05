@@ -53,7 +53,7 @@ npm run dev
 
 This project is built with:
 
-- next.js
+- vite
 - TypeScript
 - React
 - shadcn-ui
